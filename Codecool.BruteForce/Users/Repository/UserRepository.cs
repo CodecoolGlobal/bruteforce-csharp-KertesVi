@@ -37,7 +37,7 @@ public class UserRepository : IUserRepository
 
     public void Add(string userName, string password)
     {
-        var query = @$"INSERT INTO users(user_name, password) VALUES({userName}, {password})";
+        var query = @$"INSERT INTO users(user_name, password) VALUES('{userName}', '{password}')";
         using var connection = GetPhysicalDbConnection();
         using var command = GetCommand(query, connection);
 
@@ -46,7 +46,7 @@ public class UserRepository : IUserRepository
 
     public void Update(int id, string userName, string password)
     {
-        var query = @$"UPDATE users SET user_name = {userName}, password = {password} WHERE id = {id}";
+        var query = @$"UPDATE users SET user_name = '{userName}', password = '{password}' WHERE id = {id}";
         using var connection = GetPhysicalDbConnection();
         using var command = GetCommand(query, connection);
 

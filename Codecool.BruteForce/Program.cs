@@ -21,11 +21,12 @@ internal static class Program
         IUserRepository userRepository = new UserRepository(dbFile);
         userRepository.DeleteAll();
 
-        var passwordGenerators = CreatePasswordGenerators();
-        IUserGenerator userGenerator = new UserGenerator(passwordGenerators);
         int userCount = 10;
         int maxPwLength = 4;
 
+        var passwordGenerators = CreatePasswordGenerators();
+        IUserGenerator userGenerator = new UserGenerator(passwordGenerators);
+       
         AddUsersToDb(userCount, maxPwLength, userGenerator, userRepository);
 
         Console.WriteLine($"Database initialized with {userCount} users; maximum password length: {maxPwLength}");
@@ -41,12 +42,25 @@ internal static class Program
     private static void AddUsersToDb(int count, int maxPwLength, IUserGenerator userGenerator,
         IUserRepository userRepository)
     {
+        foreach (var (userName, password) in userGenerator.Generate(count, maxPwLength))
+        {
+           try
+            {
+                userRepository.Add(userName, password);
+                Console.WriteLine($"Added user: {userName}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Failed to add user: {userName}{password}. Error: {ex.Message}");
+            }
+        }
     }
+
 
     private static IEnumerable<IPasswordGenerator> CreatePasswordGenerators()
     {
-        var lowercasePwGen = new PasswordGenerator(LowercaseChars);
-        var uppercasePwGen = new PasswordGenerator(LowercaseChars, UppercaseChars);
+        IPasswordGenerator lowercasePwGen = new PasswordGenerator(LowercaseChars);
+        IPasswordGenerator uppercasePwGen = new PasswordGenerator(LowercaseChars, UppercaseChars);
         IPasswordGenerator numbersPwGen = new PasswordGenerator(Numbers); //lowercase + uppercase + numbers
 
         return new List<IPasswordGenerator>
