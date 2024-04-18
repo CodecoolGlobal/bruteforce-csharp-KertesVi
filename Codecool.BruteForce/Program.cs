@@ -42,10 +42,12 @@ internal static class Program
     private static void AddUsersToDb(int count, int maxPwLength, IUserGenerator userGenerator,
         IUserRepository userRepository)
     {
+        userRepository.DeleteAll();
+
         foreach (var (userName, password) in userGenerator.Generate(count, maxPwLength))
         {
            try
-            {
+            {                
                 userRepository.Add(userName, password);
                 Console.WriteLine($"Added user: {userName}");
             }
