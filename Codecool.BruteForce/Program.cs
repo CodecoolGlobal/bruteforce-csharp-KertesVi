@@ -47,7 +47,7 @@ internal static class Program
     {
         var lowercasePwGen = new PasswordGenerator(LowercaseChars);
         var uppercasePwGen = new PasswordGenerator(LowercaseChars, UppercaseChars);
-        IPasswordGenerator numbersPwGen = null; //lowercase + uppercase + numbers
+        IPasswordGenerator numbersPwGen = new PasswordGenerator(Numbers); //lowercase + uppercase + numbers
 
         return new List<IPasswordGenerator>
         {
