@@ -37,18 +37,38 @@ public class UserRepository : IUserRepository
 
     public void Add(string userName, string password)
     {
+        var query = @$"INSERT INTO users(user_name, password) VALUES({userName}, {password})";
+        using var connection = GetPhysicalDbConnection();
+        using var command = GetCommand(query, connection);
+
+        command.ExecuteNonQuery();
     }
 
     public void Update(int id, string userName, string password)
     {
+        var query = @$"UPDATE users SET user_name = {userName}, password = {password} WHERE id = {id}";
+        using var connection = GetPhysicalDbConnection();
+        using var command = GetCommand(query, connection);
+
+        command.ExecuteNonQuery();
     }
 
     public void Delete(int id)
     {
+        var query = @$"DELETE FROM users WHERE id = {id}";
+        using var connection = GetPhysicalDbConnection();
+        using var command = GetCommand(query, connection);
+
+        command.ExecuteNonQuery();
     }
 
     public void DeleteAll()
     {
+        var query = @$"DELETE FROM users";
+        using var connection = GetPhysicalDbConnection();
+        using var command = GetCommand(query, connection);
+
+        command.ExecuteNonQuery();     
     }
 
     public User Get(int id)
@@ -63,6 +83,17 @@ public class UserRepository : IUserRepository
 
     public IEnumerable<User> GetAll()
     {
-        return null;
+        var query = @$"SELECT * FROM users";
+        using var connection = GetPhysicalDbConnection();
+        using var command = GetCommand(query, connection);
+
+        var userList = new List<User>();
+        using var reader = command.ExecuteReader();
+
+        while (reader.Read())
+        {
+            userList.Add(new User(reader.GetInt32(0), reader.GetString(1), reader.GetString(2)));
+        }
+        return userList;
     }
 }
