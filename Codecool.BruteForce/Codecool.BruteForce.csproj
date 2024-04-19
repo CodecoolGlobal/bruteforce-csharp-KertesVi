@@ -8,15 +8,15 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="Resources" />
-    </ItemGroup>
-
-    <ItemGroup>
       <PackageReference Include="Microsoft.Data.Sqlite" Version="7.0.0" />
     </ItemGroup>
 
     <ItemGroup>
+      <None Remove="Resources\CrackedUsers.db" />
       <None Remove="Resources\Users.db" />
+      <Content Include="Resources\CrackedUsers.db">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
       <Content Include="Resources\Users.db">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>

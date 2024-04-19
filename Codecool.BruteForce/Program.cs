@@ -3,6 +3,7 @@ using Codecool.BruteForce.Passwords.Breaker;
 using Codecool.BruteForce.Passwords.Generator;
 using Codecool.BruteForce.Passwords.Model;
 using Codecool.BruteForce.Users.Generator;
+using Codecool.BruteForce.Users.Model;
 using Codecool.BruteForce.Users.Repository;
 using System.Diagnostics;
 
@@ -18,6 +19,10 @@ internal static class Program
     {
         string workDir = AppDomain.CurrentDomain.BaseDirectory;
         var dbFile = $"{workDir}\\Resources\\Users.db";
+        var crackedDbFile = $"{workDir}\\Resources\\CrackedUsers.db";
+
+        IUserRepository crackedUserRepository = new CrackedUserRepository(crackedDbFile);
+        crackedUserRepository.DeleteAll();
 
         IUserRepository userRepository = new UserRepository(dbFile);
         userRepository.DeleteAll();
@@ -34,6 +39,8 @@ internal static class Program
 
         IAuthenticationService authenticationService = new AuthenticationService(userRepository);
         BreakUsers(userCount, maxPwLength, authenticationService);
+
+        //AddCrackedUsersToDb(crackedUserRepository, crackedUserList);
 
         Console.WriteLine($"Press any key to exit.");
 
@@ -59,6 +66,24 @@ internal static class Program
         }
     }
 
+    /*private static void AddCrackedUsersToDb(IUserRepository crackedUserRepository, List<User> crackedUserList)
+    {
+        crackedUserRepository.DeleteAll();
+
+        foreach (var (userName, password) in crackedUserList))
+        {
+            try
+            {
+                crackedUserRepository.Add(userName, password);
+                Console.WriteLine($"Added user: {userName} + password: {password}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Failed to add user: {userName}. Error: {ex.Message}");
+            }
+        }
+    }
+    */
 
     private static IEnumerable<IPasswordGenerator> CreatePasswordGenerators()
     {
