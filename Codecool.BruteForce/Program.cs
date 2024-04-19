@@ -27,8 +27,8 @@ internal static class Program
         IUserRepository userRepository = new UserRepository(dbFile);
         userRepository.DeleteAll();
 
-        int userCount = 5;
-        int maxPwLength = 2;
+        int userCount = 10;
+        int maxPwLength = 4;
 
         var passwordGenerators = CreatePasswordGenerators();
         IUserGenerator userGenerator = new UserGenerator(passwordGenerators);
