@@ -27,8 +27,8 @@ internal static class Program
         IUserRepository userRepository = new UserRepository(dbFile);
         userRepository.DeleteAll();
 
-        int userCount = 10;
-        int maxPwLength = 4;
+        int userCount = 5;
+        int maxPwLength = 2;
 
         var passwordGenerators = CreatePasswordGenerators();
         IUserGenerator userGenerator = new UserGenerator(passwordGenerators);
@@ -38,9 +38,9 @@ internal static class Program
         Console.WriteLine($"Database initialized with {userCount} users; maximum password length: {maxPwLength}");
 
         IAuthenticationService authenticationService = new AuthenticationService(userRepository);
-        BreakUsers(userCount, maxPwLength, authenticationService);
+        List<User> crackedUserList = BreakUsers(userCount, maxPwLength, authenticationService);
 
-        //AddCrackedUsersToDb(crackedUserRepository, crackedUserList);
+        AddCrackedUsersToDb(crackedUserRepository, crackedUserList);
 
         Console.WriteLine($"Press any key to exit.");
 
@@ -66,12 +66,14 @@ internal static class Program
         }
     }
 
-    /*private static void AddCrackedUsersToDb(IUserRepository crackedUserRepository, List<User> crackedUserList)
+    private static void AddCrackedUsersToDb(IUserRepository crackedUserRepository, List<User> crackedUserList)
     {
         crackedUserRepository.DeleteAll();
 
-        foreach (var (userName, password) in crackedUserList))
+        foreach (var (id, userName, password) in crackedUserList)
         {
+            Console.WriteLine($"{userName}, password: {password}");
+           
             try
             {
                 crackedUserRepository.Add(userName, password);
@@ -83,7 +85,7 @@ internal static class Program
             }
         }
     }
-    */
+    
 
     private static IEnumerable<IPasswordGenerator> CreatePasswordGenerators()
     {
@@ -97,17 +99,19 @@ internal static class Program
         };
     }
 
-    private static void BreakUsers(int userCount, int maxPwLength, IAuthenticationService authenticationService)
+    private static List<User> BreakUsers(int userCount, int maxPwLength, IAuthenticationService authenticationService)
     {
+        List<User> crackedUsers = new List<User>();    
+
         var passwordBreaker = new PasswordBreaker(Numbers, LowercaseChars, UppercaseChars);
         Console.WriteLine("Initiating password breaker...\n");
 
         for (int i = 1; i <= userCount; i++)
         {
-            var user = $"user{i}";
+            var userName = $"user{i}";
             for (int j = 1; j <= maxPwLength; j++)
             {
-                Console.WriteLine($"Trying to break {user} with all possible password combinations with length = {j}... ");
+                Console.WriteLine($"Trying to break {userName} with all possible password combinations with length = {j}... ");
 
                 Stopwatch stopWatch = Stopwatch.StartNew();
                 stopWatch.Start();
@@ -115,33 +119,32 @@ internal static class Program
                 //Get all pw combinations
                 var pwCombinations =passwordBreaker.GetCombinations(j);
                 bool broken = false;
-
+               
                 foreach (var pw in pwCombinations)
                 {
-                    //Try to authenticate the current user with pw
-                    //If successful, stop the stopwatch, and print the pw and the elapsed time to the console, then go to next user
-                    if (authenticationService.Authenticate(user, pw))
+                   
+                    if (authenticationService.Authenticate(userName, pw))
                     {
                         stopWatch.Stop();
                         TimeSpan ts = stopWatch.Elapsed;
 
-                        // Format and display the TimeSpan value.
                         string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
                             ts.Hours, ts.Minutes, ts.Seconds,
                             ts.Milliseconds / 10);
-                        Console.WriteLine($"Password cracked for {user}: {pw}, Elapsed Time: {elapsedTime}");
-
+                        Console.WriteLine($"Password cracked for {userName}: {pw}, Elapsed Time: {elapsedTime}");
                         broken = true;
+                        crackedUsers.Add(new User(i, userName,pw));
                         break;
                     }
                     
                 }
-
                 if (broken)
                 {
                     break;
                 }
+              
             }
         }
+       return crackedUsers;
     }
 }
