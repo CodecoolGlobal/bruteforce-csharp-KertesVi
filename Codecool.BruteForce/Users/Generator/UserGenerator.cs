@@ -19,9 +19,9 @@ public class UserGenerator : IUserGenerator
     public IEnumerable<(string userName, string password)> Generate(int count, int maxPasswordLength)
     {
         var generatedUsers = new List<(string userName, string password)>();
-        for (int i = 0; i < count; i++)
+        for (int i = 1; i <= count; i++)
         {
-            var userName = GenerateUserName();
+            var userName = GenerateUserName(i);
             var passwordGenerator = GetRandomPasswordGenerator();
             var password = passwordGenerator.Generate(GetRandomPasswordLength(maxPasswordLength));
             generatedUsers.Add((userName, password));
@@ -29,10 +29,10 @@ public class UserGenerator : IUserGenerator
         return generatedUsers;
     }
 
-    private string GenerateUserName()
+    private static string GenerateUserName(int i)
     {
-       return "User" + _random.Next(1000, 10000);
-    }
+          return $"user{i}";
+     }
 
     private IPasswordGenerator GetRandomPasswordGenerator()
     {

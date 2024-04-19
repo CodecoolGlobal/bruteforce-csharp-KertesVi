@@ -14,7 +14,7 @@ internal static class Program
     private static readonly AsciiTableRange UppercaseChars = new(65, 90);
     private static readonly AsciiTableRange Numbers = new(48, 57);
 
-    public static void Main(string[] args)
+    public static void Main()
     {
         string workDir = AppDomain.CurrentDomain.BaseDirectory;
         var dbFile = $"{workDir}\\Resources\\Users.db";
@@ -74,7 +74,7 @@ internal static class Program
 
     private static void BreakUsers(int userCount, int maxPwLength, IAuthenticationService authenticationService)
     {
-        var passwordBreaker = new PasswordBreaker();
+        var passwordBreaker = new PasswordBreaker(Numbers, LowercaseChars, UppercaseChars);
         Console.WriteLine("Initiating password breaker...\n");
 
         for (int i = 1; i <= userCount; i++)
@@ -84,11 +84,11 @@ internal static class Program
             {
                 Console.WriteLine($"Trying to break {user} with all possible password combinations with length = {j}... ");
 
-                Stopwatch stopWatch = new Stopwatch();
+                Stopwatch stopWatch = Stopwatch.StartNew();
                 stopWatch.Start();
 
                 //Get all pw combinations
-                var pwCombinations = Array.Empty<string>();
+                var pwCombinations =passwordBreaker.GetCombinations(j);
                 bool broken = false;
 
                 foreach (var pw in pwCombinations)
@@ -104,9 +104,10 @@ internal static class Program
                         string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
                             ts.Hours, ts.Minutes, ts.Seconds,
                             ts.Milliseconds / 10);
-                        Console.WriteLine("RunTime " + elapsedTime);
+                        Console.WriteLine($"Password cracked for {user}: {pw}, Elapsed Time: {elapsedTime}");
 
                         broken = true;
+                        break;
                     }
                     
                 }

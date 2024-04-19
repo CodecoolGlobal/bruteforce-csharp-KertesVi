@@ -1,26 +1,49 @@
 ﻿using Codecool.BruteForce.Passwords.Generator;
+using Codecool.BruteForce.Passwords.Model;
+using System;
+using System.Text;
 
 namespace Codecool.BruteForce.Passwords.Breaker;
 
 public class PasswordBreaker : IPasswordBreaker
 {
-    private readonly IEnumerable<IPasswordGenerator> _pw;
-    public PasswordBreaker()
+    private readonly AsciiTableRange[] _characterSets;
+
+    public PasswordBreaker(params AsciiTableRange[] characterSets)
     {
-        _pw = new List<IPasswordGenerator>();
+        _characterSets = characterSets;
     }
+
     public IEnumerable<string> GetCombinations(int passwordLength)
     {
-        return null;
+        List<string> combinations = new List<string>();
+
+        // Generate combinations for the given password length
+        GenerateCombinationsRecursive(combinations, "", passwordLength);
+
+        return combinations;
     }
 
-    private static IEnumerable<string> GetAllPossibleCombos(IEnumerable<IEnumerable<string>> strings)
+    private void GenerateCombinationsRecursive(List<string> combinations, string prefix, int length)
     {
-        IEnumerable<string> combos = new[] { "" };
+        // Base case: if length is 0, add the prefix to the combinations list
+        if (length == 0)
+        {
+            combinations.Add(prefix);
+            return;
+        }
 
-        combos = strings
-            .Aggregate(combos, (current, inner) => current.SelectMany(c => inner, (c, i) => c + i));
-
-        return combos;
+        // Iterate over each character set and add characters to the prefix recursively
+        foreach (var characterSet in _characterSets)
+        {
+            for (int i = characterSet.Start; i <= characterSet.End; i++)
+            {
+                char character = (char)i;
+                GenerateCombinationsRecursive(combinations, prefix + character, length - 1);
+            }
+        }
     }
+
 }
+
+
