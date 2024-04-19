@@ -1,7 +1,14 @@
-﻿namespace Codecool.BruteForce.Passwords.Breaker;
+﻿using Codecool.BruteForce.Passwords.Generator;
+
+namespace Codecool.BruteForce.Passwords.Breaker;
 
 public class PasswordBreaker : IPasswordBreaker
 {
+    private readonly IEnumerable<IPasswordGenerator> _pw;
+    public PasswordBreaker()
+    {
+        _pw = new List<IPasswordGenerator>();
+    }
     public IEnumerable<string> GetCombinations(int passwordLength)
     {
         return null;

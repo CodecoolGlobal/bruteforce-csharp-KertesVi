@@ -42,6 +42,6 @@ public class UserGenerator : IUserGenerator
 
     private int GetRandomPasswordLength(int maxPasswordLength)
     {
-        return _random.Next(4, maxPasswordLength + 1);
+        return _random.Next(1, maxPasswordLength + 1);
     }
 }

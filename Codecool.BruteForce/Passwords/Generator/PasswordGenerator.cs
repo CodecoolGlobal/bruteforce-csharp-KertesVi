@@ -15,8 +15,8 @@ public class PasswordGenerator : IPasswordGenerator
 
     public string Generate(int length)
     {
-        if (length <= 3)
-            throw new ArgumentException("Password length must be greater than 3 characters.");
+        if (length <= 0)
+            throw new ArgumentException("Password length must be greater than 0 character.");
 
         var passwordBuilder = new StringBuilder();
         for (int i = 0; i < length; i++)
